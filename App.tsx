@@ -35,7 +35,7 @@ const App: React.FC = () => {
     const statusText: Record<JarvisStatus, string> = {
         idle: 'Cliquez pour démarrer',
         initializing: 'Initialisation...',
-        listening: 'En attente de "Tornade"...',
+        listening: 'En attente de "Jarvis"...',
         recording: 'Enregistrement...',
         processing: 'Traitement...',
         speaking: 'Synthèse vocale...', // Updated status text

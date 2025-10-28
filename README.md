@@ -8,7 +8,7 @@ Ceci est une application de chat vocal mains libres, avec une interface inspiré
 
 ## Fonctionnalités
 
--   **Détection de Mot-Clé**: Activation mains libres avec le mot "Tornade" via PicoVoice Porcupine.
+-   **Détection de Mot-Clé**: Activation mains libres avec le mot par défaut "Jarvis" via PicoVoice Porcupine.
 -   **STT Local**: Reconnaissance vocale (Speech-to-Text) assurée par une instance locale de Whisper.
 -   **LLM Local**: IA conversationnelle et appel d'outils ("tool-calling") gérés par un modèle local d'Ollama.
 -   **TTS Local**: Réponses vocales générées par une instance locale de Piper.
@@ -45,21 +45,12 @@ Ajoutez cette clé à votre fichier `.env` :
 PICOVOICE_ACCESS_KEY=VOTRE_CLÉ_D'ACCÈS_PICOVOICE
 ```
 
-### C. Télécharger les Modèles Porcupine
+### C. Configurer Porcupine
 
-Cette application est configurée pour utiliser le mot-clé "Tornade".
+Cette application est désormais configurée pour utiliser le mot-clé par défaut **Jarvis** fourni par Porcupine.
 
--   Téléchargez le fichier de modèle de base de Porcupine (`porcupine_params.pv`) et le fichier du mot-clé "Tornade" (`tornade_wasm.ppn`).
-    -   Le fichier `porcupine_params.pv` se trouve généralement dans le dossier `resources/params` du [dépôt GitHub de Porcupine](https://github.com/Picovoice/porcupine).
-    -   Le fichier `tornade_wasm.ppn` se trouve dans `resources/keyword_files/wasm`.
--   Créez un dossier `public/porcupine` dans votre projet.
--   Placez-y les fichiers téléchargés :
-    ```
-    public/
-    └── porcupine/
-        ├── porcupine_params.pv
-        └── tornade_wasm.ppn
-    ```
+-   Aucune ressource personnalisée n'est nécessaire : l'application charge automatiquement le modèle de détection depuis le CDN de Picovoice et active le mot-clé intégré "Jarvis".
+-   Assurez-vous simplement de disposer d'une connexion réseau lors du premier chargement pour permettre la mise en cache locale du modèle.
 
 ---
 

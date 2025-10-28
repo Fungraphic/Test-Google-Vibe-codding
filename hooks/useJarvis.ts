@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
-import { PorcupineWorker } from '@picovoice/porcupine-web';
+import { PorcupineWorker, BuiltInKeyword } from '@picovoice/porcupine-web';
 import type { ChatMessage } from '../types';
 
 // --- Configuration ---
@@ -18,7 +18,7 @@ const OLLAMA_SYSTEM_PROMPT = `You are JARVIS, a witty AI assistant from Iron Man
 You have access to a tool to control MCP servers. When a user asks to list, start, or stop a server, you must respond ONLY with a JSON object for the 'control_mcp_server' tool.
 Do not add any other text or explanation. The JSON object should have 'tool_name' and 'arguments'.
 
-Example user request: "Tornade, start the web server"
+Example user request: "Jarvis, start the web server"
 Your response: {"tool_name": "control_mcp_server", "arguments": {"command": "start", "server_name": "web"}}
 
 Example user request: "list servers"
@@ -183,7 +183,7 @@ export const useJarvis = () => {
         
         try {
             const keywordCallback = (detection: { label: string }) => {
-                if (detection.label === 'Tornade') {
+                if (detection.label === BuiltInKeyword.Jarvis) {
                     console.log('Wake word detected:', detection.label);
                     setStatus('recording');
                     if (!audioStreamRef.current) return;
@@ -210,9 +210,9 @@ export const useJarvis = () => {
 
             porcupineWorkerRef.current = await PorcupineWorker.create(
                 accessKey,
-                [{ label: 'Tornade', publicPath: '/porcupine/tornade_wasm.ppn', forceWrite: true }],
+                BuiltInKeyword.Jarvis,
                 keywordCallback,
-                { publicPath: '/porcupine/porcupine_params.pv', forceWrite: true },
+                { publicPath: 'https://cdn.picovoice.ai/porcupine/porcupine_params.pv' },
                 {
                     processErrorCallback: (error) => { setError(error.toString()); setStatus('error'); }
                 }
