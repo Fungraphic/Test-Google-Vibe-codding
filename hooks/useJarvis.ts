@@ -203,8 +203,13 @@ export const useJarvis = () => {
             };
 
             // FIX: The arguments for PorcupineWorker.create were incorrect. This passes keywordCallback and model as separate arguments to match the expected function signature.
+            const accessKey = import.meta.env.VITE_PICOVOICE_ACCESS_KEY as string | undefined;
+            if (!accessKey) {
+                throw new Error('PICOVOICE access key (VITE_PICOVOICE_ACCESS_KEY) manquant.');
+            }
+
             porcupineWorkerRef.current = await PorcupineWorker.create(
-                process.env.PICOVOICE_ACCESS_KEY as string,
+                accessKey,
                 [{ label: 'Jarvis', publicPath: '/porcupine/jarvis_wasm.ppn', forceWrite: true }],
                 keywordCallback,
                 { publicPath: '/porcupine/porcupine_params.pv', forceWrite: true },

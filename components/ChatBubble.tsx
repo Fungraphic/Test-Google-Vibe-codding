@@ -23,6 +23,10 @@ export const ChatBubble: React.FC<ChatBubbleProps> = ({ message, onDelete, onCop
       inputRef.current?.select();
     }
   }, [isEditing]);
+
+  useEffect(() => {
+    setEditedText(message.text);
+  }, [message.text]);
   
   const handleSaveEdit = () => {
     if (editedText.trim() !== message.text) {
