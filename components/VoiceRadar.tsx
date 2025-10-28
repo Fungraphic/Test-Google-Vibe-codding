@@ -39,48 +39,140 @@ export const VoiceRadar: React.FC<VoiceRadarProps> = ({ status, analyserNode }) 
     let animationFrameId: number;
     let time = 0;
 
-    const drawReticle = () => {
-        ctx.strokeStyle = 'rgba(0, 150, 200, 0.4)';
-        ctx.lineWidth = 1;
-        
-        // Main circle
-        ctx.beginPath();
-        ctx.arc(center.x, center.y, baseRadius, 0, 2 * Math.PI);
-        ctx.stroke();
+    const neonStroke = (alpha: number) => `rgba(0, 255, 255, ${alpha})`;
 
-        // Inner circle
+    const drawBackground = () => {
+      const gradient = ctx.createRadialGradient(
+        center.x,
+        center.y,
+        baseRadius * 0.2,
+        center.x,
+        center.y,
+        baseRadius * 1.6,
+      );
+      gradient.addColorStop(0, 'rgba(14, 116, 144, 0.35)');
+      gradient.addColorStop(0.5, 'rgba(10, 25, 47, 0.85)');
+      gradient.addColorStop(1, 'rgba(4, 12, 24, 0.95)');
+
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, width, height);
+
+      ctx.save();
+      ctx.strokeStyle = 'rgba(0, 180, 255, 0.18)';
+      ctx.lineWidth = 1;
+      const gridSize = baseRadius * 0.35;
+      for (let x = center.x - baseRadius * 1.5; x <= center.x + baseRadius * 1.5; x += gridSize) {
         ctx.beginPath();
-        ctx.arc(center.x, center.y, baseRadius * 0.5, 0, 2 * Math.PI);
+        ctx.moveTo(x, center.y - baseRadius * 1.5);
+        ctx.lineTo(x, center.y + baseRadius * 1.5);
         ctx.stroke();
-        
-        // Target lines
-        const lineLength = baseRadius * 0.15;
+      }
+      for (let y = center.y - baseRadius * 1.5; y <= center.y + baseRadius * 1.5; y += gridSize) {
         ctx.beginPath();
-        ctx.moveTo(center.x, center.y - baseRadius - lineLength);
-        ctx.lineTo(center.x, center.y - baseRadius + lineLength);
-        ctx.moveTo(center.x, center.y + baseRadius - lineLength);
-        ctx.lineTo(center.x, center.y + baseRadius + lineLength);
-        ctx.moveTo(center.x - baseRadius - lineLength, center.y);
-        ctx.lineTo(center.x - baseRadius + lineLength, center.y);
-        ctx.moveTo(center.x + baseRadius - lineLength, center.y);
-        ctx.lineTo(center.x + baseRadius + lineLength, center.y);
+        ctx.moveTo(center.x - baseRadius * 1.5, y);
+        ctx.lineTo(center.x + baseRadius * 1.5, y);
         ctx.stroke();
+      }
+      ctx.restore();
     };
-    
+
+    const drawReticle = () => {
+      ctx.save();
+      const radialGradient = ctx.createRadialGradient(center.x, center.y, baseRadius * 0.25, center.x, center.y, baseRadius);
+      radialGradient.addColorStop(0, 'rgba(0, 255, 255, 0.2)');
+      radialGradient.addColorStop(1, 'rgba(0, 150, 200, 0)');
+      ctx.fillStyle = radialGradient;
+      ctx.beginPath();
+      ctx.arc(center.x, center.y, baseRadius, 0, 2 * Math.PI);
+      ctx.fill();
+
+      ctx.strokeStyle = neonStroke(0.6);
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(center.x, center.y, baseRadius, 0, 2 * Math.PI);
+      ctx.stroke();
+
+      ctx.strokeStyle = neonStroke(0.45);
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.arc(center.x, center.y, baseRadius * 0.7, 0, 2 * Math.PI);
+      ctx.stroke();
+
+      ctx.strokeStyle = neonStroke(0.3);
+      ctx.lineWidth = 1;
+      ctx.setLineDash([6, 8]);
+      ctx.beginPath();
+      ctx.arc(center.x, center.y, baseRadius * 1.2, 0, 2 * Math.PI);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      const tickCount = 36;
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = neonStroke(0.6);
+      for (let i = 0; i < tickCount; i++) {
+        const angle = (i / tickCount) * Math.PI * 2;
+        const inner = baseRadius * 0.92;
+        const outer = baseRadius * 1.02;
+        ctx.beginPath();
+        ctx.moveTo(center.x + Math.cos(angle) * inner, center.y + Math.sin(angle) * inner);
+        ctx.lineTo(center.x + Math.cos(angle) * outer, center.y + Math.sin(angle) * outer);
+        ctx.stroke();
+      }
+
+      ctx.strokeStyle = neonStroke(0.6);
+      ctx.lineWidth = 1.5;
+      const crossLength = baseRadius * 0.25;
+      ctx.beginPath();
+      ctx.moveTo(center.x - crossLength, center.y);
+      ctx.lineTo(center.x + crossLength, center.y);
+      ctx.moveTo(center.x, center.y - crossLength);
+      ctx.lineTo(center.x, center.y + crossLength);
+      ctx.stroke();
+      ctx.restore();
+    };
+
+    const drawDataParticles = (frameTime: number) => {
+      const particleCount = 60;
+      for (let i = 0; i < particleCount; i++) {
+        const radius = baseRadius * (0.4 + ((i * 37) % 60) / 100);
+        const angle = (i * 0.35 + frameTime * 0.6) % (Math.PI * 2);
+        const x = center.x + Math.cos(angle) * radius;
+        const y = center.y + Math.sin(angle) * radius * 0.72;
+
+        const flicker = (Math.sin(frameTime * 3 + i) + 1) / 2;
+        ctx.fillStyle = `rgba(0, 255, 255, ${0.15 + flicker * 0.35})`;
+        ctx.beginPath();
+        ctx.arc(x, y, 2 + flicker * 2, 0, 2 * Math.PI);
+        ctx.fill();
+      }
+    };
+
     const drawHead = (opacity = 1, scale = 1) => {
-        const imgSize = Math.min(width, height) * 0.6 * scale;
-        ctx.globalAlpha = opacity;
-        ctx.drawImage(aiHeadImage, center.x - imgSize / 2, center.y - imgSize / 2, imgSize, imgSize);
-        ctx.globalAlpha = 1;
-    }
+      const imgSize = Math.min(width, height) * 0.62 * scale;
+      ctx.save();
+      ctx.globalAlpha = opacity;
+      ctx.drawImage(aiHeadImage, center.x - imgSize / 2, center.y - imgSize / 2, imgSize, imgSize);
+      ctx.restore();
+
+      ctx.save();
+      const glowGradient = ctx.createRadialGradient(center.x, center.y, imgSize * 0.2, center.x, center.y, imgSize * 0.7);
+      glowGradient.addColorStop(0, 'rgba(0, 255, 255, 0.35)');
+      glowGradient.addColorStop(1, 'rgba(0, 255, 255, 0)');
+      ctx.fillStyle = glowGradient;
+      ctx.globalCompositeOperation = 'lighter';
+      ctx.beginPath();
+      ctx.arc(center.x, center.y, imgSize * 0.55, 0, 2 * Math.PI);
+      ctx.fill();
+      ctx.restore();
+    };
 
     const draw = () => {
       ctx.clearRect(0, 0, width, height);
-      ctx.fillStyle = '#0a192f'; // Match background
-      ctx.fillRect(0,0,width,height);
+      drawBackground();
       time += 0.02;
 
       drawReticle();
+      drawDataParticles(time);
 
       switch (status) {
         case 'recording':
