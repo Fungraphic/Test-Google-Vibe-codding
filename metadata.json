@@ -1,0 +1,7 @@
+{
+  "name": "JARVIS AI Voice Assistant",
+  "description": "A hands-free, voice-to-voice chat application with a JARVIS-style interface, powered by Google's Gemini API. Features real-time transcription and message management.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
