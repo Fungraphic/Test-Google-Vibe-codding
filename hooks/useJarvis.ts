@@ -18,7 +18,7 @@ const OLLAMA_SYSTEM_PROMPT = `You are JARVIS, a witty AI assistant from Iron Man
 You have access to a tool to control MCP servers. When a user asks to list, start, or stop a server, you must respond ONLY with a JSON object for the 'control_mcp_server' tool.
 Do not add any other text or explanation. The JSON object should have 'tool_name' and 'arguments'.
 
-Example user request: "Jarvis, start the web server"
+Example user request: "Tornade, start the web server"
 Your response: {"tool_name": "control_mcp_server", "arguments": {"command": "start", "server_name": "web"}}
 
 Example user request: "list servers"
@@ -183,7 +183,7 @@ export const useJarvis = () => {
         
         try {
             const keywordCallback = (detection: { label: string }) => {
-                if (detection.label === 'Jarvis') {
+                if (detection.label === 'Tornade') {
                     console.log('Wake word detected:', detection.label);
                     setStatus('recording');
                     if (!audioStreamRef.current) return;
@@ -210,7 +210,7 @@ export const useJarvis = () => {
 
             porcupineWorkerRef.current = await PorcupineWorker.create(
                 accessKey,
-                [{ label: 'Jarvis', publicPath: '/porcupine/jarvis_wasm.ppn', forceWrite: true }],
+                [{ label: 'Tornade', publicPath: '/porcupine/tornade_wasm.ppn', forceWrite: true }],
                 keywordCallback,
                 { publicPath: '/porcupine/porcupine_params.pv', forceWrite: true },
                 {
