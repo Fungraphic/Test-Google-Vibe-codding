@@ -118,12 +118,14 @@ if __name__ == "__main__":
 Ce serveur reçoit du texte et génère un fichier audio `.wav` en utilisant Piper.
 
 **Prérequis :**
-1.  Téléchargez l'exécutable de [Piper](https://github.com/rhasspy/piper/releases).
+1.  Téléchargez l'exécutable de [Piper](https://github.com/OHF-Voice/piper1-gpl/releases).
 2.  Téléchargez un modèle vocal (fichier `.onnx` et `.json`) depuis la même page.
 3.  Placez l'exécutable dans votre PATH ou spécifiez son chemin dans le script. Placez le modèle (`.onnx` et `.json`) dans le même dossier que le script.
 ```bash
 pip install "fastapi" "uvicorn[standard]" "pydantic"
 ```
+
+> ℹ️ La distribution OHF propose également un paquet Python officiel `piper-tts` (voir la section « Python » du dépôt [piper1-gpl](https://github.com/OHF-Voice/piper1-gpl)) si vous préférez l'installer depuis PyPI au lieu d'utiliser l'exécutable.
 
 **Créez un fichier `piper_server.py`:**
 ```python
